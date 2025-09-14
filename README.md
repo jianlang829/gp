@@ -1,4 +1,69 @@
-Developing a simulated stock game is a project that is both fun and financially literate
+# 📈 模拟股票大师 —— 你的第一款零成本虚拟投资游戏
+
+> 💡 无需注册 · 无需登录 · 双击即玩 · 数据本地保存  
+> 🎯 学会分散风险 · 理解复利力量 · 避免情绪化交易 —— 在游戏中成为真正的投资者！
+
+---
+
 ## 📊 游戏界面截图
-![PixPin_2025-09-14_16-43-17](https://github.com/user-attachments/assets/1e23c60f-da6c-435f-9b77-13a09328112f)
-> 模拟股票大师：无需登录，双击即玩！
+
+![模拟股票大师 - 实时交易界面](https://raw.githubusercontent.com/jianlang829/gp/main/images/sample.jpg)
+
+> 🖼️ *图片仅 200KB，使用 JPG 格式 + 800px 宽度优化，加载飞快！*  
+
+---
+
+## 🚀 核心功能
+
+- ✅ 使用真实股票数据（AAPL, TSLA, NVDA, MSFT…）
+- ✅ $100,000 虚拟本金，自由买卖
+- ✅ 实时股价刷新（每30秒更新）
+- ✅ 买入 / 卖出 / 止损 / 持仓追踪
+- ✅ 模拟经济新闻事件影响股价
+- ✅ 本地存储：关闭后重开，数据仍在！
+- ✅ 无广告 · 无追踪 · 无服务器依赖
+
+---
+
+## 🛠 如何开始？
+
+1. 下载 [**模拟股票大师.html**](https://github.com/jianlang829/gp/releases/download/v1.0/sim-stock-game.html)（点击下载）  
+2. 双击文件 → 自动在浏览器打开  
+3. 开始你的财富之旅！📈
+
+> 💡 手机也能玩！微信/QQ 发给朋友，他们也能双击打开！
+
+---
+
+## 🤝 和朋友比一比？
+
+- 截图你的总资产发朋友圈：“我赚了 $247,000！”
+- 或者导出你的“战绩存档”发给朋友：
+  1. 打开游戏 → 按 `F12` → 打开 Console
+  2. 输入：`localStorage.getItem('stockGame')`
+  3. 复制返回的 JSON 字符串 → 发给朋友
+  4. 朋友在 Console 中粘贴并执行：
+     ```javascript
+     localStorage.setItem('stockGame', '你的JSON字符串')
+     ```
+  5. 刷新页面 → 成功同步你的战绩！
+
+---
+
+## 📁 项目结构
+
+---
+
+## 📌 注意事项
+
+- 本游戏为**纯模拟器**，不涉及真实资金或金融建议。
+- 所有数据存储于**浏览器本地**（localStorage），隐私安全。
+
+---
+
+## ❤️ 欢迎 Star ⭐
+
+如果你觉得这个项目有趣、有教育意义，请点个 Star 支持一下！  
+也欢迎提交 Issue 或 Pull Request，一起打造更强大的“虚拟华尔街”！
+
+> 🏆 “不是每个人都能成为巴菲特，但每个人都可以从一场模拟开始。”
