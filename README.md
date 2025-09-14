@@ -7,7 +7,7 @@
 
 ## 📊 游戏界面截图
 
-![模拟股票大师 - 实时交易界面](https://raw.githubusercontent.com/jianlang829/gp/main/images/sample.jpg)
+![模拟股票大师 - 实时交易界面](https://raw.githubusercontent.com/jianlang829/gp/main/images/Sample.jpg)
 
 > 🖼️ *图片仅 200KB，使用 JPG 格式 + 800px 宽度优化，加载飞快！*  
 
