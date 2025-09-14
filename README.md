@@ -25,7 +25,7 @@
 
 ## 🛠 如何开始？
 
-1. 下载 [**模拟股票大师.html**](https://github.com/jianlang829/gp/releases/download/v1.0/sim-stock-game.html)（点击下载）  
+1. 下载 [**模拟股票大师.html**](https://github.com/jianlang829/gp/releases/tag/v1.0/sim-stock-game.html)（点击下载）  
 2. 双击文件 → 自动在浏览器打开  
 3. 开始你的财富之旅！📈
 
