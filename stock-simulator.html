@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>💰 模拟股票大师 - 虚拟投资游戏</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 15px;
+            background: #f5f7fa;
+            color: #333;
+        }
+
+        #app {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .stat {
+            text-align: center;
+            margin: 15px 0;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .stat span {
+            color: #e74c3c;
+        }
+
+        hr {
+            border: 0;
+            border-top: 1px solid #eee;
+            margin: 25px 0;
+        }
+
+        .stock-item {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 12px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fafafa;
+        }
+
+        .stock-info h3 {
+            margin: 0 0 5px 0;
+            color: #2c3e50;
+        }
+
+        .stock-price {
+            font-weight: bold;
+            color: #27ae60;
+        }
+
+        .stock-price.down {
+            color: #e74c3c;
+        }
+
+        button {
+            padding: 8px 14px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .buy {
+            background: #27ae60;
+            color: white;
+        }
+
+        .sell {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .portfolio-section h3 {
+            margin-top: 20px;
+            color: #2c3e50;
+        }
+
+        .portfolio-item {
+            padding: 10px;
+            margin: 8px 0;
+            background: #f0f7ff;
+            border-radius: 6px;
+            border-left: 4px solid #3498db;
+        }
+
+        .news {
+            background: #fffde7;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #ffc107;
+            font-size: 0.95em;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #7f8c8d;
+            font-size: 0.85em;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <h1>💰 模拟股票大师</h1>
+        <div class="stat">你有：<span id="cash">$100,000</span></div>
+        <div class="stat">总资产：<span id="total">$100,000</span></div>
+
+        <div class="news" id="news">🎯 今日新闻：科技股迎来新一波上涨浪潮！</div>
+
+        <hr>
+        <h3>📈 可交易股票（实时数据）</h3>
+        <div id="stocks"></div>
+
+        <hr>
+        <div class="portfolio-section">
+            <h3>💼 我的持仓</h3>
+            <div id="portfolio">
+                <p>暂无持仓</p>
+            </div>
+        </div>
+
+        <div class="footer">
+            ⚠️ 这是模拟游戏，不涉及真实投资。仅供学习娱乐。
+        </div>
+    </div>
+
+    <script>
+        // ==================== 配置区 ====================
+        const stocks = [
+            { symbol: 'AAPL', name: '苹果' },
+            { symbol: 'TSLA', name: '特斯拉' },
+            { symbol: 'NVDA', name: '英伟达' },
+            { symbol: 'MSFT', name: '微软' },
+            { symbol: 'GOOGL', name: '谷歌' },
+            { symbol: 'AMZN', name: '亚马逊' },
+            { symbol: 'META', name: 'Meta' },
+            { symbol: 'AMD', name: '超威半导体' }
+        ];
+
+        // 随机新闻池
+        const newsPool = [
+            "科技股迎来新一波上涨浪潮！",
+            "美联储暗示可能降息，市场情绪乐观",
+            "某公司发布革命性AI产品，股价暴涨！",
+            "能源价格飙升，新能源板块受益",
+            "CEO突发辞职，公司股价下跌15%",
+            "全球供应链改善，制造业回暖",
+            "比特币突破7万美元，加密概念股跟涨",
+            "经济衰退担忧加剧，防御性股票受青睐"
+        ];
+
+        let cash = 100000;
+        let portfolio = {};
+        let stockPrices = {};
+        let lastNewsIndex = -1;
+
+        // 加载本地数据
+        if (localStorage.getItem('stockGame')) {
+            const saved = JSON.parse(localStorage.getItem('stockGame'));
+            cash = saved.cash || 100000;
+            portfolio = saved.portfolio || {};
+        }
+
+        // 获取随机新闻（避免重复）
+        function getRandomNews() {
+            let newIndex;
+            do {
+                newIndex = Math.floor(Math.random() * newsPool.length);
+            } while (newIndex === lastNewsIndex && newsPool.length > 1);
+            lastNewsIndex = newIndex;
+            return newsPool[newIndex];
+        }
+
+        // 更新新闻
+        function updateNews() {
+            document.getElementById('news').innerText = getRandomNews();
+        }
+
+        // 获取股价（使用 Yahoo Finance 免费接口）
+        async function fetchStockPrice(symbol) {
+            try {
+                const res = await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1m`);
+                const data = await res.json();
+                const price = data.chart.result?.[0]?.meta?.regularMarketPrice;
+                return price ? price : 0;
+            } catch (e) {
+                console.warn(`获取 ${symbol} 失败`, e);
+                // 返回一个合理范围内的随机值作为兜底
+                return Math.floor(Math.random() * 150) + 50;
+            }
+        }
+
+        // 更新界面
+        function updateUI() {
+            document.getElementById('cash').innerText = '$' + cash.toLocaleString();
+
+            const totalValue = cash + Object.keys(portfolio).reduce((sum, sym) => {
+                const price = stockPrices[sym] || 0;
+                return sum + (portfolio[sym] * price);
+            }, 0);
+            document.getElementById('total').innerText = '$' + totalValue.toLocaleString();
+
+            // 渲染股票列表
+            const stocksEl = document.getElementById('stocks');
+            stocksEl.innerHTML = stocks.map(stock => {
+                const price = stockPrices[stock.symbol] || 0;
+                const isUp = price > (stockPrices.last?.[stock.symbol] || 0);
+                const priceClass = isUp ? '' : 'down';
+                stockPrices.last = { ...stockPrices.last, [stock.symbol]: price };
+
+                return `
+          <div class="stock-item">
+            <div class="stock-info">
+              <h3>${stock.symbol} (${stock.name})</h3>
+              <p>当前价：<span class="stock-price ${priceClass}">$${price.toFixed(2)}</span></p>
+            </div>
+            <div>
+              <button class="buy" onclick="buy('${stock.symbol}', ${price})">买入</button>
+              <button class="sell" onclick="sell('${stock.symbol}', ${price})">卖出</button>
+            </div>
+          </div>
+        `;
+            }).join('');
+
+            // 渲染持仓
+            const portfolioEl = document.getElementById('portfolio');
+            if (Object.keys(portfolio).length === 0) {
+                portfolioEl.innerHTML = '<p>暂无持仓</p>';
+            } else {
+                portfolioEl.innerHTML = Object.entries(portfolio).map(([sym, qty]) => {
+                    const price = stockPrices[sym] || 0;
+                    const value = qty * price;
+                    return `<div class="portfolio-item">${sym}: ${qty}股 · 总值 $${value.toFixed(2)}</div>`;
+                }).join('');
+            }
+
+            // 检查是否盈利（第一次盈利弹窗）
+            const total = parseFloat(document.getElementById('total').innerText.replace(/[^0-9.-]+/g, ''));
+            if (total > 100000 && !localStorage.getItem('firstProfit')) {
+                alert("🎉 恭喜！你第一次赚到钱了！这就是复利的力量！");
+                localStorage.setItem('firstProfit', 'true');
+            }
+        }
+
+        // 买入函数
+        window.buy = function (symbol, price) {
+            const amount = prompt("请输入购买数量：", "1");
+            if (!amount || isNaN(amount) || amount <= 0) return;
+            const cost = parseFloat(amount) * price;
+            if (cost > cash) {
+                alert("❌ 余额不足！");
+                return;
+            }
+            cash -= cost;
+            portfolio[symbol] = (portfolio[symbol] || 0) + parseInt(amount);
+            saveGame();
+            updateUI();
+        };
+
+        // 卖出函数
+        window.sell = function (symbol, price) {
+            if (!portfolio[symbol] || portfolio[symbol] <= 0) {
+                alert("⚠️ 你没有持有这只股票！");
+                return;
+            }
+            const amount = prompt("请输入卖出数量：", portfolio[symbol]);
+            if (!amount || isNaN(amount) || amount <= 0) return;
+            if (parseInt(amount) > portfolio[symbol]) {
+                alert("⚠️ 你没有这么多股票！");
+                return;
+            }
+            const income = parseFloat(amount) * price;
+            cash += income;
+            portfolio[symbol] -= parseInt(amount);
+            if (portfolio[symbol] <= 0) delete portfolio[symbol];
+            saveGame();
+            updateUI();
+        };
+
+        // 保存到本地存储
+        function saveGame() {
+            localStorage.setItem('stockGame', JSON.stringify({ cash, portfolio }));
+        }
+
+        // 初始化
+        async function init() {
+            updateNews();
+            setInterval(updateNews, 30000); // 每30秒换一条新闻
+
+            for (let stock of stocks) {
+                stockPrices[stock.symbol] = await fetchStockPrice(stock.symbol);
+            }
+            updateUI();
+
+            // 每30秒刷新一次股价
+            setInterval(async () => {
+                for (let stock of stocks) {
+                    stockPrices[stock.symbol] = await fetchStockPrice(stock.symbol);
+                }
+                updateUI();
+            }, 30000);
+        }
+
+        // 启动
+        init();
+    </script>
+</body>
+
+</html>
